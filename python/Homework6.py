@@ -9,7 +9,7 @@ training_epochs = 20
 display_epoch = 1
 ###############################################################
 CUSTOM_NODES = True
-LOGDIR = "/tmp/mnist_tutorial/final/"
+LOGDIR = "tmp/mnist_tutorial/final/"
 ###############################################################
 
 #create a Fully Connected Layer
