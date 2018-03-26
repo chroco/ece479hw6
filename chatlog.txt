@@ -1,0 +1,13 @@
+lright I noticed a few things you can try. 
+So, on line 39 and 53, change the count to 41 and 31. These are the number of door and window images there are to loop through and add. 
+on line 27, change validation_size to 1. 
+on line 36, 78, 84, and 85 change the 1800 to 72. This should be the total number of images.
+ok
+Thank you. Stupid python
+on line 148 and 149, change training_epochs to 7 and batch_size to 10.
+also, are you doing any preprocessing? because all the images need to be the same size for this to work. Currently the code assumes the images are 50x50 pixels
+wow what a picky algorithm
+i have not done any preprocessing yet
+i will preprocess using canny-hough but i guess there is a bit more too
+i was just trying to get the script to run
+
