@@ -5,6 +5,7 @@ This example is using the MNIST database of handwritten digits
 Author: Aymeric Damien
 Project: https://github.com/aymericdamien/TensorFlow-Examples/
 '''
+
 from __future__ import print_function
 from PIL import Image
 import matplotlib.pyplot as plt
@@ -21,10 +22,9 @@ import numpy as np
 
 num_classes = 2
 
-
 ######################################################################################
 count = 20
-validation_size = 1
+validation_size = -1
 train_images = []
 train_labels = []
 validation_images = []
@@ -41,7 +41,7 @@ for i in range (0,count):
     #img = 'C:\\Users\\Kestutis\\Desktop\\Images_HW11\\Train\\Cats\\cat.'+str(i)+'.jpg'
 #    img = '../images/doors/door.'+str(i)+'.jpg'
 #    img = '/home/chad/ECE479/ece479hw6/images/doors/door.'+str(i)+'.jpg'
-    img = Image.open('../images/doors/door.'+str(i)+'.jpg')
+    img = Image.open('../images/doors/door'+str(i)+'.jpg')
     if i > validation_size-1:
         train_images.append(img)
         train_labels.append(0)
@@ -53,7 +53,7 @@ for i in range (0,count):
 for i in range (0,count):
     #img = Image.open('C:\\Users\\Kestutis\\Desktop\\Images_HW11\\Train\\Dogs\\dog.'+str(i)+'.jpg')
     #img = 'C:\\Users\\Kestutis\\Desktop\\Images_HW11\\Train\\Dogs\\dog.'+str(i)+'.jpg'
-    img = Image.open('../images/windows/window.'+str(i)+'.jpg')
+    img = Image.open('../images/windows/window'+str(i)+'.jpg')
 #    img = '/home/chad/ECE479/ece479hw6/images/windows/window.'+str(i)+'.jpg'
     if i > validation_size-1:
         train_images.append(img)
@@ -140,13 +140,14 @@ with tf.Session() as sess:
 
 
 
+
 # Parameters
 starter_learning_rate = 0.001
 global_step = tf.Variable(0)
 #global_step = tf.Variable(0, trainable=False)
 learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step, 100, 0.95, staircase=True)
-training_epochs = 7
-batch_size = 10
+training_epochs = 4
+batch_size = 8
 display_epoch = 1
 logs_path = 'tmp/tensorflow_logs/doors_windows/'
 
@@ -225,7 +226,7 @@ with tf.Session() as sess:
         avg_cost = 0.
         total_batch = int(len(train_images)/batch_size)
         # Loop over all batches
-        for i in range(100):            #total_batch
+        for i in range(5):            #total_batch
             batch_xs, batch_ys = sess.run(next_element)
            # batch_ys = tf.cast(train_labels[i], tf.string)
 
