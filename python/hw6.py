@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 '''
 Graph and Loss visualization using Tensorboard.
 This example is using the MNIST database of handwritten digits
@@ -37,11 +39,10 @@ temp = np.zeros([40,2])
 
 
 for i in range (0,count):
-    #img = Image.open('C:\\Users\\Kestutis\\Desktop\\Images_HW11\\Train\\Cats\\cat.'+str(i)+'.jpg')
-    #img = 'C:\\Users\\Kestutis\\Desktop\\Images_HW11\\Train\\Cats\\cat.'+str(i)+'.jpg'
-#    img = '../images/doors/door.'+str(i)+'.jpg'
-#    img = '/home/chad/ECE479/ece479hw6/images/doors/door.'+str(i)+'.jpg'
-    img = Image.open('../images/doors/door'+str(i)+'.jpg')
+#    img = '../images/doors/door'+str(i)+'.jpg'
+#    img = '../images/canny_doors/door'+str(i)+'.jpg'
+#    img = '../images/standard_hough_doors/door'+str(i)+'.jpg'
+    img = '../images/probabilistic_hough_doors/door'+str(i)+'.jpg'
     if i > validation_size-1:
         train_images.append(img)
         train_labels.append(0)
@@ -51,10 +52,10 @@ for i in range (0,count):
         validation_images.append(img)
         validation_labels.append(0)
 for i in range (0,count):
-    #img = Image.open('C:\\Users\\Kestutis\\Desktop\\Images_HW11\\Train\\Dogs\\dog.'+str(i)+'.jpg')
-    #img = 'C:\\Users\\Kestutis\\Desktop\\Images_HW11\\Train\\Dogs\\dog.'+str(i)+'.jpg'
-    img = Image.open('../images/windows/window'+str(i)+'.jpg')
-#    img = '/home/chad/ECE479/ece479hw6/images/windows/window.'+str(i)+'.jpg'
+#    img = '../images/windows/window'+str(i)+'.jpg'
+#    img = '../images/canny_windows/window'+str(i)+'.jpg'
+#    img = '../images/standard_hough_windows/window'+str(i)+'.jpg'
+    img = '../images/probabilistic_hough_windows/window'+str(i)+'.jpg'
     if i > validation_size-1:
         train_images.append(img)
         train_labels.append(1)
@@ -142,14 +143,15 @@ with tf.Session() as sess:
 
 
 # Parameters
-starter_learning_rate = 0.001
+starter_learning_rate = 0.0001
+#starter_learning_rate = 0.001
 global_step = tf.Variable(0)
 #global_step = tf.Variable(0, trainable=False)
 learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step, 100, 0.95, staircase=True)
 training_epochs = 4
 batch_size = 8
 display_epoch = 1
-logs_path = 'tmp/tensorflow_logs/doors_windows/'
+logs_path = '/tmp/tensorflow_logs'
 
 # tf Graph Input
 # mnist data image of shape 28*28=784
@@ -160,10 +162,15 @@ y = tf.placeholder(tf.float32, [None, 2], name='LabelData')
 #y = tf.placeholder(tf.float32, [1,], name='LabelData')
 
 #Parameters:
-K = 500
+K = 250
 L = 100
-M = 60
-N = 30
+M = 50
+N = 10
+
+#K = 500
+#L = 100
+#M = 60
+#N = 30
 
 #Set model weights & bias:
 W1 = tf.Variable(tf.random_normal([50*50, K], stddev=0.1), name='Weights')
@@ -178,9 +185,12 @@ W5 = tf.Variable(tf.random_normal([N, 2], stddev=0.1), name='Weights')
 b5 = tf.Variable(tf.zeros([2]), name='Bias')
 
 #Activation functions & layer connection:
-Y1 = tf.nn.leaky_relu(tf.matmul(x,W1)+b1)
-Y2 = tf.nn.leaky_relu(tf.matmul(Y1,W2)+b2)
-Y3 = tf.nn.leaky_relu(tf.matmul(Y2,W3)+b3)
+#Y1 = tf.nn.leaky_relu(tf.matmul(x,W1)+b1)
+#Y2 = tf.nn.leaky_relu(tf.matmul(Y1,W2)+b2)
+#Y3 = tf.nn.leaky_relu(tf.matmul(Y2,W3)+b3)
+Y1 = tf.nn.sigmoid(tf.matmul(x,W1)+b1)
+Y2 = tf.nn.sigmoid(tf.matmul(Y1,W2)+b2)
+Y3 = tf.nn.sigmoid(tf.matmul(Y2,W3)+b3)
 Y4 = tf.nn.leaky_relu(tf.matmul(Y3,W4)+b4)
 Output = tf.matmul(Y4, W5) + b5
 
@@ -248,8 +258,8 @@ with tf.Session() as sess:
 
     # Test model
     # Calculate accuracy
-    sess.run(validation_init_op)
-    print("Accuracy:", acc.eval({x: validation_dataset[0], y: validation_dataset[1]}))
+#    sess.run(validation_init_op)
+#    print("Accuracy:", acc.eval({x: validation_dataset[0], y: validation_dataset[1]}))
     print("Run the command line:\n" \
         "--> tensorboard --logdir=/tmp/tensorflow_logs " \
         "\nThen open http://0.0.0.0:6006/ into your web browser")

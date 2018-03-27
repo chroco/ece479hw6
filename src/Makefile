@@ -9,8 +9,8 @@ all: canny houghdemo houghlines
 #$(TARGET): $(SRC)
 #	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(FLAGS) 
 
-canny: CannyDetector_Demo.cpp
-	$(CC) $(CFLAGS) CannyDetector_Demo.cpp -o canny $(FLAGS) 
+canny: CannyDetector.cpp
+	$(CC) $(CFLAGS) CannyDetector.cpp -o canny $(FLAGS) 
 
 houghdemo: HoughLines_Demo.cpp
 	$(CC) $(CFLAGS) HoughLines_Demo.cpp -o houghdemo $(FLAGS) 

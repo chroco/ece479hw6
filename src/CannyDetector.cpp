@@ -7,10 +7,12 @@
 #include "opencv2/imgproc.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
+#include <vector>
 
 using namespace cv;
 
-//![variables]
+#define FILE_NAME_LENGTH 100
+
 Mat src, src_gray;
 Mat dst, detected_edges;
 
@@ -20,7 +22,8 @@ int const max_lowThreshold = 100;
 int ratio = 3;
 int kernel_size = 3;
 const char* window_name = "Edge Map";
-//![variables]
+char file[FILE_NAME_LENGTH] = {'\0'};
+bool QUIET = true;
 
 /**
  * @function CannyThreshold
@@ -28,62 +31,73 @@ const char* window_name = "Edge Map";
  */
 static void CannyThreshold(int, void*)
 {
-    //![reduce_noise]
+    src.copyTo( dst, detected_edges);
+    
     /// Reduce noise with a kernel 3x3
     blur( src_gray, detected_edges, Size(3,3) );
-    //![reduce_noise]
 
-    //![canny]
     /// Canny detector
+		if(QUIET){
+			lowThreshold = 50;
+		}
     Canny( detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size );
-    //![canny]
 
     /// Using Canny's output as a mask, we display our result
-    //![fill]
     dst = Scalar::all(0);
-    //![fill]
 
-    //![copyto]
     src.copyTo( dst, detected_edges);
-    //![copyto]
+		
+		std::vector<int> compression_params;
+    compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
+    compression_params.push_back(95);
+		char temp[100]={'\0'};
+		int i,size=sizeof("canny_")/sizeof(char);
+		strncpy(temp,"canny_",size);
+	
+		strcat(temp,file);
+		imwrite(temp, dst, compression_params);
 
-    //![display]
-    imshow( window_name, dst );
-    //![display]
+    if(!QUIET){
+			imshow( window_name, dst );
+		}
 }
-
 
 /**
  * @function main
  */
-int main( int, char** argv )
+int main( int argc, char** argv )
 {
-  //![load]
-  src = imread( argv[1], IMREAD_COLOR ); // Load an image
+	if(!*argv[1]){
+		fprintf(stderr,"danger\n");
+		return 1;
+	}
+	if(argc==3){
+		printf("(%d:%c)\n",argc,*argv[argc-1]);
+		if(*argv[argc-1]=='0'){
+			QUIET=false;
+		}
+	}
+
+	int i;
+	for(i=0;i<FILE_NAME_LENGTH;++i){
+		file[i]=*(argv[1]+i);
+	}
+	file[i+1]='\0';
+  src = imread( file, IMREAD_COLOR ); // Load an image
 
   if( src.empty() )
     { return -1; }
-  //![load]
 
-  //![create_mat]
   /// Create a matrix of the same type and size as src (for dst)
   dst.create( src.size(), src.type() );
-  //![create_mat]
 
-  //![convert_to_gray]
   cvtColor( src, src_gray, COLOR_BGR2GRAY );
-  //![convert_to_gray]
 
-  //![create_window]
-  namedWindow( window_name, WINDOW_AUTOSIZE );
-  //![create_window]
+  if(!QUIET){
+		namedWindow( window_name, WINDOW_AUTOSIZE );
+		createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
+	}
 
-  //![create_trackbar]
-  /// Create a Trackbar for user to enter threshold
-  createTrackbar( "Min Threshold:", window_name, &lowThreshold, max_lowThreshold, CannyThreshold );
-  //![create_trackbar]
-
-  /// Show the image
   CannyThreshold(0, 0);
 
   /// Wait until user exit program by pressing a key
